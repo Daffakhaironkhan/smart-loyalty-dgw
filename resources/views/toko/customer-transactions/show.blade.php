@@ -1,0 +1,55 @@
+<x-app-layout>
+    <x-slot name="header"><h2 class="text-xl font-semibold leading-tight text-slate-900">Detail Transaksi Konsumen</h2></x-slot>
+
+    <div class="py-8">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+            <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-900">Detail Transaksi Konsumen</h1>
+                    <p class="mt-1 text-sm text-slate-500">Lihat detail transaksi konsumen, item produk, poin, dan status validasi.</p>
+                </div>
+                <a href="{{ route('toko.customer-transactions.index') }}" class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Kembali</a>
+            </div>
+
+            <div class="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div><p class="text-sm text-slate-500">Kode Transaksi</p><p class="mt-1 font-semibold text-slate-900">{{ $customerTransaction->transaction_code }}</p></div>
+                    <div><p class="text-sm text-slate-500">Tanggal Transaksi</p><p class="mt-1 font-semibold text-slate-900">{{ $customerTransaction->transaction_date }}</p></div>
+                    <div><p class="text-sm text-slate-500">Toko/Kios</p><p class="mt-1 font-semibold text-slate-900">{{ $customerTransaction->store->store_name ?? '-' }}</p></div>
+                    <div><p class="text-sm text-slate-500">Konsumen</p><p class="mt-1 font-semibold text-slate-900">{{ $customerTransaction->customer->name ?? '-' }}</p></div>
+                    <div><p class="text-sm text-slate-500">Total Transaksi</p><p class="mt-1 font-semibold text-slate-900">Rp {{ number_format($customerTransaction->total_amount, 0, ',', '.') }}</p></div>
+                    <div><p class="text-sm text-slate-500">Total Poin Konsumen</p><p class="mt-1 font-semibold text-blue-700">{{ number_format($customerTransaction->total_customer_points) }}</p></div>
+                    <div>
+                        <p class="text-sm text-slate-500">Status</p>
+                        <div class="mt-2">
+                            @if ($customerTransaction->status === 'approved')
+                                <span class="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">Approved</span>
+                            @elseif ($customerTransaction->status === 'rejected')
+                                <span class="rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-700">Rejected</span>
+                            @else
+                                <span class="rounded-full bg-yellow-100 px-2.5 py-1 text-xs font-medium text-yellow-700">Pending</span>
+                            @endif
+                        </div>
+                    </div>
+                    @if ($customerTransaction->rejection_reason)
+                        <div class="md:col-span-2 rounded-2xl bg-red-50 p-4"><p class="text-sm font-medium text-red-800">Alasan Penolakan</p><p class="mt-1 text-sm text-red-700">{{ $customerTransaction->rejection_reason }}</p></div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div class="border-b border-slate-100 px-6 py-4"><h3 class="text-lg font-semibold text-slate-900">Detail Produk</h3></div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-[850px] w-full text-left text-sm">
+                        <thead class="bg-slate-50 text-slate-700"><tr><th class="px-4 py-3">Produk</th><th class="px-4 py-3">Qty</th><th class="px-4 py-3">Harga</th><th class="px-4 py-3">Subtotal</th><th class="px-4 py-3">Poin</th></tr></thead>
+                        <tbody>
+                        @foreach ($customerTransaction->items as $item)
+                            <tr class="border-t border-slate-100"><td class="px-4 py-3 font-medium text-slate-900">{{ $item->product->product_name ?? '-' }}</td><td class="px-4 py-3 text-slate-700">{{ number_format($item->quantity) }}</td><td class="px-4 py-3 text-slate-700">Rp {{ number_format($item->price, 0, ',', '.') }}</td><td class="px-4 py-3 text-slate-700">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td><td class="px-4 py-3 text-slate-700">{{ number_format($item->customer_points) }}</td></tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
