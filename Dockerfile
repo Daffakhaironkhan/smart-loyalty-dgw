@@ -1,4 +1,4 @@
-FROM php:8.4-apache
+FROM php:8.4-cli
 
 RUN apt-get update && apt-get install -y \
     git \
@@ -14,19 +14,6 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_pgsql pgsql zip mbstring exif pcntl bcmath gd \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-RUN rm -f /etc/apache2/mods-enabled/mpm_event.load \
-    /etc/apache2/mods-enabled/mpm_event.conf \
-    /etc/apache2/mods-enabled/mpm_worker.load \
-    /etc/apache2/mods-enabled/mpm_worker.conf \
-    && a2enmod mpm_prefork rewrite
-
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
-    /etc/apache2/sites-available/*.conf \
-    /etc/apache2/apache2.conf \
-    /etc/apache2/conf-available/*.conf
 
 WORKDIR /var/www/html
 
@@ -45,13 +32,12 @@ RUN mkdir -p storage/framework/cache/data \
     storage/logs \
     bootstrap/cache
 
-RUN chown -R www-data:www-data storage bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
+RUN chmod -R 775 storage bootstrap/cache
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD php artisan config:clear && \
     php artisan route:clear && \
     php artisan view:clear && \
     php artisan migrate --force && \
-    apache2-foreground
+    php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
