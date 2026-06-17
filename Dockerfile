@@ -21,6 +21,8 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 COPY . .
 
+RUN rm -f public/hot
+
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 RUN npm install
