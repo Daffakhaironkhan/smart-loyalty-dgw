@@ -12,9 +12,11 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     nodejs \
     npm \
-    && docker-php-ext-install pdo pdo_pgsql pgsql zip mbstring exif pcntl bcmath gd
+    && docker-php-ext-install pdo pdo_pgsql pgsql zip mbstring exif pcntl bcmath gd \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Enable Apache rewrite
+# Fix Apache MPM + enable rewrite
 RUN a2dismod mpm_event mpm_worker || true \
     && a2enmod mpm_prefork rewrite
 
@@ -41,10 +43,17 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 RUN npm install
 RUN npm run build
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# Make sure Laravel storage folders exist
+RUN mkdir -p storage/framework/cache/data \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/logs \
+    bootstrap/cache
 
-# Laravel optimization will run after env is available
+# Set permissions
+RUN chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
+
 EXPOSE 80
 
 CMD php artisan config:clear && \
