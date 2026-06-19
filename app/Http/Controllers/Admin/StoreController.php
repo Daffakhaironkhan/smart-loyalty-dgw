@@ -26,7 +26,11 @@ class StoreController extends Controller
                     ->orWhere('phone', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('city', 'like', "%{$search}%")
-                    ->orWhere('area', 'like', "%{$search}%");
+                    ->orWhere('area', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('email', 'like', "%{$search}%")
+                            ->orWhere('username', 'like', "%{$search}%");
+                    });
             });
         }
 

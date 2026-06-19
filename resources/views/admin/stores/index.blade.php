@@ -39,8 +39,8 @@
                             <input type="text"
                                    name="search"
                                    value="{{ request('search') }}"
-                                   placeholder="Kode, nama toko, owner, kota, area..."
-                                   class="mt-1 w-full rounded-xl border-slate-300 shadow-sm focus:border-b border-slate-100lue-500 focus:ring-blue-500">
+                                   placeholder="Kode, nama toko, owner, email, kota, area..."
+                                   class="mt-1 w-full rounded-xl border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         </div>
 
                         <div>
@@ -48,7 +48,7 @@
                                 Status
                             </label>
                             <select name="status"
-                                    class="mt-1 w-full rounded-xl border-slate-300 shadow-sm focus:border-b border-slate-100lue-500 focus:ring-blue-500">
+                                    class="mt-1 w-full rounded-xl border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                 <option value="">Semua Status</option>
                                 <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>
                                     Active
@@ -104,7 +104,7 @@
                                 </td>
 
                                 <td class="px-4 py-3 text-slate-700">
-                                    {{ $store->email ?? '-' }}
+                                    {{ $store->user->email ?? $store->email ?? '-' }}
                                 </td>
 
                                 <td class="px-4 py-3 text-slate-700">
